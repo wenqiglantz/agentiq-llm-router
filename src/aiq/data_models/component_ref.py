@@ -132,3 +132,39 @@ class RetrieverRef(ComponentRef):
     @typing.override
     def component_group(self):
         return ComponentGroup.RETRIEVERS
+
+
+class LLMRouter(ComponentRef):
+    """
+    A reference to an LLM Router in an AgentIQ configuration object.
+    This includes the necessary configuration for routing LLM requests.
+    
+    Args:
+        value (str): The router name or identifier.
+        api_key (str): The API key for the LLM router.
+        base_url (str): The base URL for the LLM router.
+        policy (str): The policy for routing LLM requests.
+        routing_strategy (str): The strategy for routing LLM requests.
+    """
+    
+    api_key: str
+    base_url: str
+    policy: str
+    routing_strategy: str
+    
+    def __new__(cls, value: str, api_key: str, base_url: str, policy: str, routing_strategy: str):
+        # Create the string instance
+        instance = super().__new__(cls, value)
+        
+        # Set the attributes for the LLM router
+        instance.api_key = api_key
+        instance.base_url = base_url
+        instance.policy = policy
+        instance.routing_strategy = routing_strategy
+        
+        return instance
+    
+    @property
+    @typing.override
+    def component_group(self):
+        return ComponentGroup.LLMS  # Using LLMS as the component group for now

@@ -67,11 +67,13 @@ examples = [
     { name = "aiq-automated-description-generation" },
     { name = "aiq-email-phishing-analyzer" },
     { name = "aiq-multi-frameworks" },
+    { name = "aiq-multi-frameworks-llm-router" },
     { name = "aiq-plot-charts" },
     { name = "aiq-semantic-kernel-demo" },
     { name = "aiq-simple" },
     { name = "aiq-simple-calculator" },
     { name = "aiq-swe-bench" },
+    { name = "llm-router-integration" },
 ]
 langchain = [
     { name = "agentiq-langchain" },
@@ -139,6 +141,7 @@ requires-dist = [
     { name = "aiq-automated-description-generation", marker = "extra == 'examples'", editable = "examples/automated_description_generation" },
     { name = "aiq-email-phishing-analyzer", marker = "extra == 'examples'", editable = "examples/email_phishing_analyzer" },
     { name = "aiq-multi-frameworks", marker = "extra == 'examples'", editable = "examples/multi_frameworks" },
+    { name = "aiq-multi-frameworks-llm-router", marker = "extra == 'examples'", editable = "examples/multi_frameworks_llm_router" },
     { name = "aiq-plot-charts", marker = "extra == 'examples'", editable = "examples/plot_charts" },
     { name = "aiq-semantic-kernel-demo", marker = "extra == 'examples'", editable = "examples/semantic_kernel_demo" },
     { name = "aiq-simple", marker = "extra == 'examples'", editable = "examples/simple" },
@@ -150,6 +153,7 @@ requires-dist = [
     { name = "httpx", specifier = "~=0.27" },
     { name = "jinja2", specifier = "~=3.1" },
     { name = "jsonpath-ng", specifier = "~=1.7" },
+    { name = "llm-router-integration", marker = "extra == 'examples'", editable = "examples/llm_router_integration" },
     { name = "matplotlib", marker = "extra == 'profiling'", specifier = "~=3.9" },
     { name = "mcp", specifier = ">=1.0.0" },
     { name = "networkx", specifier = "~=3.4" },
@@ -511,6 +515,26 @@ requires-dist = [
 [[package]]
 name = "aiq-multi-frameworks"
 source = { editable = "examples/multi_frameworks" }
+dependencies = [
+    { name = "agentiq", extra = ["langchain", "llama-index"] },
+    { name = "arxiv" },
+    { name = "colorama" },
+    { name = "markdown-it-py" },
+    { name = "nvidia-haystack" },
+]
+
+[package.metadata]
+requires-dist = [
+    { name = "agentiq", extras = ["langchain", "llama-index"], editable = "." },
+    { name = "arxiv", specifier = "~=2.1.3" },
+    { name = "colorama", specifier = "~=0.4.6" },
+    { name = "markdown-it-py", specifier = "~=3.0" },
+    { name = "nvidia-haystack", specifier = "==0.1.2" },
+]
+
+[[package]]
+name = "aiq-multi-frameworks-llm-router"
+source = { editable = "examples/multi_frameworks_llm_router" }
 dependencies = [
     { name = "agentiq", extra = ["langchain", "llama-index"] },
     { name = "arxiv" },
@@ -2953,6 +2977,16 @@ sdist = { url = "https://files.pythonhosted.org/packages/21/af/f0062356f2ba1f32b
 wheels = [
     { url = "https://files.pythonhosted.org/packages/77/d5/9e360e31fb5852842c434043c2a7ba6714a363546b5adeedff537fae5e0d/llama_parse-0.6.4.post1-py3-none-any.whl", hash = "sha256:fdc7adb87283c2f952c830d9057c156a1349c1e6e04444d7466e732903fbc150", size = 4902 },
 ]
+
+[[package]]
+name = "llm-router-integration"
+source = { editable = "examples/llm_router_integration" }
+dependencies = [
+    { name = "agentiq", extra = ["langchain"] },
+]
+
+[package.metadata]
+requires-dist = [{ name = "agentiq", extras = ["langchain"], editable = "." }]
 
 [[package]]
 name = "lxml"

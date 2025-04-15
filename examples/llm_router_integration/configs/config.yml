@@ -13,11 +13,36 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-# pylint: disable=unused-import
-# flake8: noqa
-# isort:skip_file
+general:
+  use_uvloop: true
+  telemetry:
+    logging:
+      console:
+        _type: console
+        level: WARN
+      file:
+        _type: file
+        path: /tmp/llm_router_integration.log
+        level: DEBUG
+    tracing:
+      phoenix:
+        _type: phoenix
+        endpoint: http://localhost:6006/v1/traces
+        project: llm_router_integration
 
-# Import any providers which need to be automatically registered here
-from . import nim_llm
-from . import openai_llm
-from . import llm_router
+functions: 
+  llm_router_tool:
+    _type: llm_router_tool
+    llm_name: llm_router
+
+llms:
+  llm_router:
+    _type: llm_router
+    api_key: '###'
+    base_url: http://10.176.221.83:8084/v1
+    policy: task_router
+    routing_strategy: triton
+
+workflow:
+  _type: llm_router_integration
+  llm_router_tool: llm_router_tool
