@@ -42,11 +42,11 @@ class LLMRouterConfig(LLMBaseConfig, name="llm_router"):
     )
     policy: str = Field(
         default="task_router", 
-        description="Policy to use for LLM routing (e.g., 'task_router', 'cost_based')."
+        description="Policy to use for LLM routing (e.g., 'task_router', 'complexity_router')."
     )
     routing_strategy: str = Field(
         default="triton", 
-        description="Backend routing strategy implementation (e.g., 'triton', 'direct')."
+        description="Backend routing strategy implementation (e.g., 'triton', 'manual')."
     )
 
 
