@@ -20,7 +20,7 @@ import logging
 from pathlib import Path
 
 import pytest
-from aiq_multi_frameworks.register import MultiFrameworksWorkflowConfig
+from aiq_llm_router_integration.register import LLMRouterIntegrationConfig
 
 from aiq.runtime.loader import load_workflow
 
@@ -30,15 +30,15 @@ logger = logging.getLogger(__name__)
 @pytest.mark.e2e
 async def test_full_workflow():
 
-    package_name = inspect.getmodule(MultiFrameworksWorkflowConfig).__package__
+    package_name = inspect.getmodule(LLMRouterIntegrationConfig).__package__
 
     config_file: Path = importlib.resources.files(package_name).joinpath("configs", "config.yml").absolute()
 
     async with load_workflow(config_file) as workflow:
 
-        async with workflow.run("tell me about this workflow") as runner:
+        async with workflow.run("Tell me the difference between Model Context Protocol and Agent2Agent") as runner:
 
             result = await runner.result(to_type=str)
 
         result = result.lower()
-        assert "workflow" in result
+        assert "Agent2Agent" in result
