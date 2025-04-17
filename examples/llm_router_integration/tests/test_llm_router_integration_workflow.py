@@ -20,9 +20,9 @@ import logging
 from pathlib import Path
 
 import pytest
-from aiq_llm_router_integration.register import LLMRouterIntegrationConfig
 
 from aiq.runtime.loader import load_workflow
+from llm_router_integration.register import LLMRouterIntegrationConfig
 
 logger = logging.getLogger(__name__)
 

@@ -28,7 +28,7 @@ from . import llama_index_rag_tool  # noqa: F401, pylint: disable=unused-import
 logger = logging.getLogger(__name__)
 
 
-class MultiFrameworksWorkflowConfig(FunctionBaseConfig, name="multi_frameworks_llm_router"):
+class MultiFrameworksLLMRouterWorkflowConfig(FunctionBaseConfig, name="multi_frameworks_llm_router"):
     # Add your custom configuration parameters here
     llm: LLMRef = "nim_llm"
     llm_router_tool: FunctionRef
@@ -37,8 +37,8 @@ class MultiFrameworksWorkflowConfig(FunctionBaseConfig, name="multi_frameworks_l
     chitchat_agent: FunctionRef
 
 
-@register_function(config_type=MultiFrameworksWorkflowConfig, framework_wrappers=[LLMFrameworkEnum.LANGCHAIN])
-async def multi_frameworks_llm_router_workflow(config: MultiFrameworksWorkflowConfig, builder: Builder):
+@register_function(config_type=MultiFrameworksLLMRouterWorkflowConfig, framework_wrappers=[LLMFrameworkEnum.LANGCHAIN])
+async def multi_frameworks_llm_router_workflow(config: MultiFrameworksLLMRouterWorkflowConfig, builder: Builder):
     # Implement your workflow logic here
     from typing import TypedDict
 
