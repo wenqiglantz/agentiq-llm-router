@@ -13,22 +13,25 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-import pytest
-from unittest import mock
 import typing
+from unittest import mock
 
-from openai.types.chat import ChatCompletion, ChatCompletionMessage
-from openai.types.completion_usage import CompletionUsage
+import pytest
 from openai.types import Completion
+from openai.types.chat import ChatCompletion
+from openai.types.chat import ChatCompletionMessage
+from openai.types.completion_usage import CompletionUsage
 
 from aiq.builder.builder import Builder
 from aiq.builder.function_info import FunctionInfo
-from aiq.tool.llm_router_tool import LLMRouterToolConfig, llm_router_tool
 from aiq.data_models.component_ref import LLMRef
+from aiq.tool.llm_router_tool import LLMRouterToolConfig
+from aiq.tool.llm_router_tool import llm_router_tool
 
 
 class MockRawResponse:
     """Mock for the raw response from OpenAI."""
+
     def __init__(self, headers: dict, completion: ChatCompletion):
         self.headers = headers
         self._completion = completion
@@ -49,27 +52,17 @@ def mock_openai_client():
 @pytest.fixture
 def mock_chat_completion():
     """Fixture to create a mock ChatCompletion object."""
-    message = ChatCompletionMessage(
-        content="This is a test response",
-        role="assistant",
-        usage_metadata=None
-    )
-    
-    usage = CompletionUsage(
-        prompt_tokens=10,
-        completion_tokens=20,
-        total_tokens=30
-    )
-    
-    completion = ChatCompletion(
-        id="test-id",
-        choices=[Completion(index=0, message=message, finish_reason="stop")],
-        created=1234567890,
-        model="test-model",
-        object="chat.completion",
-        usage=usage
-    )
-    
+    message = ChatCompletionMessage(content="This is a test response", role="assistant", usage_metadata=None)
+
+    usage = CompletionUsage(prompt_tokens=10, completion_tokens=20, total_tokens=30)
+
+    completion = ChatCompletion(id="test-id",
+                                choices=[Completion(index=0, message=message, finish_reason="stop")],
+                                created=1234567890,
+                                model="test-model",
+                                object="chat.completion",
+                                usage=usage)
+
     return completion
 
 
@@ -82,20 +75,18 @@ def mock_builder():
     llm_config.base_url = "https://test-router-url.com"
     llm_config.policy = "test-policy"
     llm_config.routing_strategy = "test-strategy"
-    
+
     builder.get_llm_config.return_value = llm_config
     return builder
 
 
-@pytest.mark.parametrize("config_values",
-                         [
-                             {
-                                 "llm_name": "test_llm",
-                             },
-                         ],
-                         ids=[
-                             "basic_config",
-                         ])
+@pytest.mark.parametrize("config_values", [
+    {
+        "llm_name": "test_llm",
+    },
+], ids=[
+    "basic_config",
+])
 def test_llm_router_tool_config(config_values: dict[str, typing.Any]):
     """
     Test the LLMRouterToolConfig class.
@@ -107,7 +98,7 @@ def test_llm_router_tool_config(config_values: dict[str, typing.Any]):
     model_dump.pop('type')
 
     LLMRouterToolConfig.model_validate(model_dump, strict=True)
-    
+
     # Validate the config has the expected field
     assert isinstance(config.llm_name, LLMRef)
     assert config.llm_name == "test_llm"
@@ -123,24 +114,24 @@ async def test_llm_router_tool_successful_call(mock_openai_client, mock_chat_com
     headers = {"X-Chosen-Classifier": "test-classifier"}
     mock_raw_response = MockRawResponse(headers=headers, completion=mock_chat_completion)
     mock_openai_client.chat.completions.with_raw_response.create.return_value = mock_raw_response
-    
+
     # Create the tool config
     config = LLMRouterToolConfig(llm_name="test_llm")
-    
+
     # Get the tool function
     tool_gen = llm_router_tool(config, mock_builder)
     tool_info = await anext(tool_gen)
-    
+
     assert isinstance(tool_info, FunctionInfo)
-    
+
     # Call the tool function
     router_fn = tool_info.fn
     result = await router_fn("What is the meaning of life?")
-    
+
     # Verify the OpenAI client was called with the correct parameters
     mock_openai_client.chat.completions.with_raw_response.create.assert_called_once()
     call_args = mock_openai_client.chat.completions.with_raw_response.create.call_args[1]
-    
+
     assert call_args["messages"] == [{"role": "user", "content": "What is the meaning of life?"}]
     assert call_args["model"] == ""  # Model is determined by the router
     assert call_args["extra_body"] == {
@@ -149,17 +140,13 @@ async def test_llm_router_tool_successful_call(mock_openai_client, mock_chat_com
             "routing_strategy": "test-strategy",
         }
     }
-    
+
     # Verify the result is as expected
     assert result == mock_chat_completion
-    
+
     # Verify the usage metadata was processed
     assert hasattr(result.choices[0].message, "usage_metadata")
-    assert result.choices[0].message.usage_metadata == {
-        "input_tokens": 10,
-        "output_tokens": 20,
-        "total_tokens": 30
-    }
+    assert result.choices[0].message.usage_metadata == {"input_tokens": 10, "output_tokens": 20, "total_tokens": 30}
 
 
 @pytest.mark.asyncio
@@ -172,23 +159,23 @@ async def test_llm_router_tool_error_handling(mock_openai_client, mock_builder):
     mock_error.response = mock.MagicMock()
     mock_error.response.status_code = 500
     mock_error.response.text = "Internal Server Error"
-    
+
     mock_openai_client.chat.completions.with_raw_response.create.side_effect = mock_error
-    
+
     # Create the tool config
     config = LLMRouterToolConfig(llm_name="test_llm")
-    
+
     # Get the tool function
     tool_gen = llm_router_tool(config, mock_builder)
     tool_info = await anext(tool_gen)
-    
+
     assert isinstance(tool_info, FunctionInfo)
-    
+
     # Call the tool function and expect it to raise the same exception
     router_fn = tool_info.fn
     with pytest.raises(Exception) as excinfo:
         await router_fn("What is the meaning of life?")
-    
+
     assert str(excinfo.value) == "Test error"
 
 
@@ -200,25 +187,25 @@ async def test_llm_router_tool_no_usage_info(mock_openai_client, mock_chat_compl
     # Create a completion with no usage info
     completion_no_usage = mock_chat_completion
     completion_no_usage.usage = None
-    
+
     # Setup the mock response
     headers = {"X-Chosen-Classifier": "test-classifier"}
     mock_raw_response = MockRawResponse(headers=headers, completion=completion_no_usage)
     mock_openai_client.chat.completions.with_raw_response.create.return_value = mock_raw_response
-    
+
     # Create the tool config
     config = LLMRouterToolConfig(llm_name="test_llm")
-    
+
     # Get the tool function
     tool_gen = llm_router_tool(config, mock_builder)
     tool_info = await anext(tool_gen)
-    
+
     # Call the tool function
     router_fn = tool_info.fn
     result = await router_fn("What is the meaning of life?")
-    
+
     # Verify the result is as expected
     assert result == completion_no_usage
-    
+
     # Since there's no usage info, we expect a warning but no error
-    # (This is logged, not returned, so we can't easily check it) 
+    # (This is logged, not returned, so we can't easily check it)

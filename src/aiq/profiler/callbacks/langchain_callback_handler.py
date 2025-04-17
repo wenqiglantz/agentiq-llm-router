@@ -243,18 +243,17 @@ class LangchainProfilerHandler(AsyncCallbackHandler, BaseProfilerCallback):  # p
         **kwargs: Any,
     ) -> Any:
 
-        stats = IntermediateStepPayload(event_type=IntermediateStepType.TOOL_START,
-                                        framework=LLMFrameworkEnum.LANGCHAIN,
-                                        name=serialized.get("name", ""),
-                                        UUID=str(run_id),
-                                        data=StreamEventData(input=input_str),
-                                        metadata=TraceMetadata(tool_inputs=copy.deepcopy(inputs),
-                                                               tool_info=copy.deepcopy(serialized)),
-                                        usage_info=UsageInfo(token_usage=TokenUsageBaseModel(),
-                                                            #  num_llm_calls=1,
-                                                             seconds_between_calls=int(time.time() -
-                                                                                       self.last_call_ts))
-                                        )
+        stats = IntermediateStepPayload(
+            event_type=IntermediateStepType.TOOL_START,
+            framework=LLMFrameworkEnum.LANGCHAIN,
+            name=serialized.get("name", ""),
+            UUID=str(run_id),
+            data=StreamEventData(input=input_str),
+            metadata=TraceMetadata(tool_inputs=copy.deepcopy(inputs), tool_info=copy.deepcopy(serialized)),
+            usage_info=UsageInfo(
+                token_usage=TokenUsageBaseModel(),
+                #  num_llm_calls=1,
+                seconds_between_calls=int(time.time() - self.last_call_ts)))
 
         self.step_manager.push_intermediate_step(stats)
         self._run_id_to_tool_input[str(run_id)] = input_str
@@ -278,7 +277,7 @@ class LangchainProfilerHandler(AsyncCallbackHandler, BaseProfilerCallback):  # p
                 if hasattr(output.choices[0].message, 'usage_metadata'):
                     usage_metadata = output.choices[0].message.usage_metadata
                     logger.debug(f"Extracted usage_metadata from message: {usage_metadata}")
-            
+
             # If not found, try the top-level usage attribute (OpenAI format)
             if not usage_metadata and hasattr(output, 'usage'):
                 usage = output.usage
@@ -289,23 +288,23 @@ class LangchainProfilerHandler(AsyncCallbackHandler, BaseProfilerCallback):  # p
                         "total_tokens": usage.total_tokens
                     }
                     logger.debug(f"Extracted usage from top-level usage attribute: {usage_metadata}")
-            
+
             # Direct attempt if it's a dict with usage_metadata
             if not usage_metadata and hasattr(output, 'usage_metadata'):
                 usage_metadata = output.usage_metadata
                 logger.debug(f"Extracted usage_metadata directly: {usage_metadata}")
-                
+
         except Exception as e:
             logger.exception("Error getting usage metadata: %s", e, exc_info=True)
 
-        stats = IntermediateStepPayload(event_type=IntermediateStepType.TOOL_END,
-                                        span_event_timestamp=self._run_id_to_start_time.get(str(run_id), time.time()),
-                                        framework=LLMFrameworkEnum.LANGCHAIN,
-                                        name=kwargs.get("name", ""),
-                                        UUID=str(run_id),
-                                        metadata=TraceMetadata(tool_outputs=output),
-                                        usage_info=UsageInfo(token_usage=self._extract_token_base_model(usage_metadata)),                
-                                        data=StreamEventData(input=self._run_id_to_tool_input.get(str(run_id), ""),
-                                                             output=output))
+        stats = IntermediateStepPayload(
+            event_type=IntermediateStepType.TOOL_END,
+            span_event_timestamp=self._run_id_to_start_time.get(str(run_id), time.time()),
+            framework=LLMFrameworkEnum.LANGCHAIN,
+            name=kwargs.get("name", ""),
+            UUID=str(run_id),
+            metadata=TraceMetadata(tool_outputs=output),
+            usage_info=UsageInfo(token_usage=self._extract_token_base_model(usage_metadata)),
+            data=StreamEventData(input=self._run_id_to_tool_input.get(str(run_id), ""), output=output))
 
         self.step_manager.push_intermediate_step(stats)

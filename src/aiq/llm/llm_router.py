@@ -25,42 +25,32 @@ from aiq.data_models.llm import LLMBaseConfig
 class LLMRouterConfig(LLMBaseConfig, name="llm_router"):
     """
     An LLM Router provider to be used with an LLM client.
-    
-    This provider routes requests to different LLM backends based on configurable 
+
+    This provider routes requests to different LLM backends based on configurable
     policies and strategies.
     """
 
     model_config = ConfigDict(protected_namespaces=())
 
-    api_key: str | None = Field(
-        default=None, 
-        description="API key to interact with the LLM router service."
-    )
-    base_url: str | None = Field(
-        default=None, 
-        description="Base URL of the LLM router service."
-    )
-    policy: str = Field(
-        default="task_router", 
-        description="Policy to use for LLM routing (e.g., 'task_router', 'complexity_router')."
-    )
-    routing_strategy: str = Field(
-        default="triton", 
-        description="Backend routing strategy implementation (e.g., 'triton', 'manual')."
-    )
+    api_key: str | None = Field(default=None, description="API key to interact with the LLM router service.")
+    base_url: str | None = Field(default=None, description="Base URL of the LLM router service.")
+    policy: str = Field(default="task_router",
+                        description="Policy to use for LLM routing (e.g., 'task_router', 'complexity_router').")
+    routing_strategy: str = Field(default="triton",
+                                  description="Backend routing strategy implementation (e.g., 'triton', 'manual').")
 
 
 @register_llm_provider(config_type=LLMRouterConfig)
 async def llm_router(llm_config: LLMRouterConfig, builder: Builder):
     """
     Register an LLM Router provider with the given configuration.
-    
+
     Args:
         llm_config: Configuration for the LLM Router
         builder: Builder instance for configuration
-        
+
     Yields:
         LLMProviderInfo: Information about the registered LLM provider
     """
-    
+
     yield LLMProviderInfo(config=llm_config, description="A LLM Router for use with an LLM client.")
