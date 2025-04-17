@@ -18,11 +18,12 @@ limitations under the License.
 
 # LLM Router Integration
 
+This LLM Router Integration example demonstrates how to build an AgentIQ workflow that integrates with an LLM router service. This workflow allows for intelligent routing of user queries to appropriate language models based on the query content, leveraging NVIDIA's routing infrastructure to optimize model selection for different types of tasks.
+
 ## Table of Contents
 
 - [LLM Router Integration](#llm-router-integration)
   - [Table of Contents](#table-of-contents)
-  - [Overview](#overview)
   - [Key Features](#key-features)
   - [Installation and Setup](#installation-and-setup)
     - [Setup Virtual Environment and Install AgentIQ](#setup-virtual-environment-and-install-agentiq)
@@ -36,18 +37,14 @@ limitations under the License.
     - [Run the Docker Container](#run-the-docker-container)
     - [Test the API](#test-the-api)
 
-## Overview
-
-The LLM Router Integration example demonstrates how to build an AgentIQ workflow that integrates with an LLM router service. This workflow allows for intelligent routing of user queries to appropriate language models based on the query content, leveraging NVIDIA's routing infrastructure to optimize model selection for different types of tasks.
-
 ## Key Features
 
-- **LLM Routing**: Automatically routes queries to the most appropriate language model based on the query content.
-- **Policy-Based Routing**: Supports different routing policies like task-based routing.
-- **Triton Integration**: Uses Triton Inference Server for efficient model serving and routing.
-- **Error Handling**: Robust error handling for API calls and request processing.
-- **Agentic Workflows**: Fully configurable via YAML for flexibility and productivity.
-- **Logging and Telemetry**: Comprehensive logging and tracing for monitoring and debugging.
+- **Optimized Model Selection**: The LLM Router dynamically routes prompts to the best-suited LLM, improving efficiency and accuracy in Agent toolkit workflows.
+- **Cost Efficiency**: By avoiding overuse of expensive, high-capacity models for trivial tasks, the integration reduces inference costs, especially in enterprise-scale Agent toolkit deployments.
+- **Performance Enhancement**: The LLM Router’s low-latency design (using Rust and Triton) ensures minimal overhead, complementing Agent toolkit’s focus on rapid development and optimized workflows.  Agent toolkit’s telemetry can further tune routing decisions based on real-time performance data.
+- **Scalability**: The modular design of both tools supports scaling across multiple LLMs and agents, ideal for complex multi-agent systems in Agent toolkit.
+- **Flexibility**: Developers can fine-tune the LLM Router’s policies (e.g., task-based, cost-based) to align with Agent toolkit’s custom workflows, enhancing adaptability for specific use cases like data analysis or code generation.
+- **Seamless Ecosystem Integration**: Both tools leverage NVIDIA NIMs and microservices, ensuring smooth interoperability within Azure AI Foundry or other NVIDIA-accelerated platforms.
 
 ## Installation and Setup
 
@@ -190,7 +187,7 @@ docker build --build-arg AIQ_VERSION=$(python -m setuptools_scm) -t llm_router_i
 Deploy the container:
 
 ```bash
-docker run -p 8000:8000 -e NVIDIA_API_KEY=<YOUR_API_KEY> llm_router_integration
+docker run -p 8000:8000 -e NVIDIA_API_KEY llm_router_integration
 ```
 
 ### Test the API
@@ -202,7 +199,29 @@ curl -X 'POST' \
   'http://localhost:8000/generate' \
   -H 'accept: application/json' \
   -H 'Content-Type: application/json' \
-  -d '{"input_message": "What is the capital of France and what are some popular tourist attractions there?"}'
+  -d '{"text": "Tell me the difference between Model Context Protocol and Agent2Agent"}'
 ```
 
 The API will respond with the output from the most appropriate language model based on your query content.
+
+### Expected API Output
+The API response should look like this:
+
+```
+$ curl -X 'POST' \
+  'http://localhost:8000/generate' \
+  -H 'accept: application/json' \
+  -H 'Content-Type: application/json' \
+  -d '{"text": "Tell me the difference between Model Context Protocol and Agent2Agent"}'
+{"value":"Two interesting topics in the realm of multi-agent systems!\n\nModel Context Protocol (MCP) and Agent2Agent (A2A) are both communication protocols used in multi-agent systems, but they serve different purposes and have different design goals.\n\n**Model Context Protocol (MCP)**\n\nMCP is a protocol designed for the integration of heterogeneous models and simulations. It was developed by the US Department of Defense (DoD) to enable the interoperability of different simulation systems, such as warfare simulations, logistics simulations, and training simulations.\n\nMCP provides a standardized way to describe the context of a simulation, including the models, data, and interfaces used. This allows different simulations to be combined and executed in a coordinated manner, enabling large-scale, distributed simulations.\n\nKey features of MCP:\n\n* Focus on integration of heterogeneous models and simulations\n* Standardized context description for simulations\n* Enables large-scale, distributed simulations\n* Supports interoperability between different simulation systems\n\n**Agent2Agent (A2A)**\n\nA2A is a protocol designed for agent communication in multi-agent systems. It was developed by the FIPA (Foundation for Intelligent Physical Agents) consortium to provide a standardized way for software agents to communicate with each other.\n\nA2A defines a set of message formats and interaction protocols for agent-to-agent communication. It supports the exchange of information, services, and tasks between agents, enabling them to cooperate and coordinate their actions.\n\nKey features of A2A:\n\n* Focus on agent communication in multi-agent systems\n* Standardized message formats and interaction protocols\n* Enables cooperation and coordination between software agents\n* Supports the exchange of information, services, and tasks between agents\n\n**Key differences**\n\n1. **Purpose**: MCP is designed for the integration of heterogeneous models and simulations, while A2A is designed for agent communication in multi-agent systems.\n2. **Scope**: MCP has a broader scope, encompassing simulation integration, while A2A is focused on agent communication.\n3. **Messaging**: MCP uses XML-based messages to describe simulation contexts, while A2A uses standardized message formats (e.g., ACL - Agent Communication Language) for agent-to-agent communication.\n4. **Complexity**: MCP is generally more complex, as it deals with the integration of multiple simulations, while A2A is relatively simpler, focusing on agent communication.\n\nIn summary, while both protocols are used in multi-agent systems, they serve different purposes and have different design goals. MCP is focused on simulation integration, while A2A is focused on agent communication."}(
+```
+
+Sample log from the container:
+```
+2025-04-17 14:50:06,934 - httpx - INFO - HTTP Request: POST http://#.#.#.#:8084/v1/chat/completions "HTTP/1.1 200 OK"
+2025-04-17 14:50:06,948 - aiq.tool.llm_router_tool - INFO - Prompt was classified as 'Open QA' & handled by model: meta/llama-3.1-70b-instruct
+2025-04-17 14:50:06,949 - aiq.tool.llm_router_tool - INFO - Token usage: {'input_tokens': 22, 'output_tokens': 511, 'total_tokens': 533}
+2025-04-17 14:50:06,968 - llm_router_integration.register - INFO - Successfully received response from LLM Router
+2025-04-17 14:50:06,969 - aiq.observability.async_otel_listener - INFO - Intermediate step stream completed. No more events will arrive.
+INFO:     172.17.0.1:45614 - "POST /generate HTTP/1.1" 200 OK
+```

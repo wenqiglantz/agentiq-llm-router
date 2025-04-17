@@ -38,7 +38,7 @@ RUN --mount=type=cache,id=uv_cache,target=/root/.cache/uv,sharing=locked \
     export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_AGENTIQ=${AIQ_VERSION} && \
     export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_AGENTIQ_TEST=${AIQ_VERSION} && \
     export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_AGENTIQ_LANGCHAIN=${AIQ_VERSION} && \
-    export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_AIQ_LLM_ROUTER_INTEGRATION=${AIQ_VERSION} && \
+    export SETUPTOOLS_SCM_PRETEND_VERSION_FOR_LLM_ROUTER_INTEGRATION=${AIQ_VERSION} && \
     uv venv --python ${PYTHON_VERSION} /workspace/.venv && \
     uv sync --link-mode=copy --compile-bytecode --python ${PYTHON_VERSION} && \
     uv pip install --link-mode=copy ./examples/llm_router_integration

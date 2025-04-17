@@ -15,53 +15,36 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-# multi_frameworks_llm_router Example
+# Multi Frameworks LLM Router 
 
-This example demonstrates how to integrate multiple AI frameworks seamlessly using a set of LangChain / LangGraph agents, in AgentIQ.
-AgentIQ is framework-agnostic, allowing usage of custom and pre-built preferred AI tools without restriction due to AI framework.
+We use the code of `multi_frameworks` as the foundation and modify it to build `multi_frameworks_llm_router`. We replaced the `langchain_research_tool` to call LLM Router.  Given the user input, the supervisor node classifies it as either being about `Retrieve`, `General`, or `Research` topic.  `Retrieve` topic gets routed to `llama_index_rag` tool, `General` topic gets routed to `haystack_chitchat_agent`, and `Research` tool gets routed to LLM Router to process. 
 
-## Overview
+## Table of Contents
 
-LangChain is incredibly flexible, LlamaIndex is incredibly powerful for building RAG pipelines;
-different AI frameworks excel at different tasks.
-Instead of committing to just one, this example shows how they can work together via AgentIQ.
-
-In this example, we combine:
-- **Haystack Agent** – with a configurable LLM.
-- **LangChain Research Tool** – web search.
-- **LlamaIndex RAG Tool** – document Q&A (pre-configured to use this README)
-
-This example workflow leverages the AgentIQ plugin system and `Builder` object to demonstrate how the `Builder` object can dynamically wrap any Python function—regardless of its underlying AI framework or implementation—and convert it into another AI framework of our choice.
-
-In this example, we wrap all three of the above tools as LangChain Tools.
-Then, using LangChain and LangGraph, we unify these frameworks into a single workflow, demonstrating interoperability and flexibility. The goal is not to favor one tool over another but to showcase how different AI stacks can complement each other.
-
-
-## Why This Matters
-
-- **Leverage Strengths** – Different AI frameworks specialize in different areas.
-- **Interoperability** – Combine tools seamlessly without vendor lock-in.
-- **Scalability** – Build flexible AI pipelines that adapt to different use cases.
-
+- [Multi Frameworks LLM Router](#multi-frameworks-llm-router)
+  - [Table of Contents](#table-of-contents)
+  - [Key Features](#key-features)
+  - [Installation and Setup](#installation-and-setup)
+    - [Setup Virtual Environment and Install AgentIQ](#setup-virtual-environment-and-install-agentiq)
+    - [Install this Workflow](#install-this-workflow)
+    - [Set Up API Keys](#set-up-api-keys)
+  - [Configuration](#configuration)
+  - [Example Usage](#example-usage)
+    - [Run the Workflow](#run-the-workflow)
+  - [Deployment-Oriented Setup](#deployment-oriented-setup)
+    - [Build the Docker Image](#build-the-docker-image)
+    - [Run the Docker Container](#run-the-docker-container)
+    - [Test the API](#test-the-api)
 
 ## Key Features
 
+- **LLM Router Integration:** with integration with LLM Router, this workflow demostrates how we build workflows that can tap into the power of LLM Router. 
 - **Custom-plug-in Tools:** with a basic llama-index RAG ingesting README from within this workflow
 - **Custom Plugin System:** Developers can bring in new tools using plugins.
 - **High-level API:** Enables defining functions that transform into asynchronous LangChain tools.
 - **Agentic Workflows:** Fully configurable via YAML for flexibility and productivity.
 - **Ease of Use:** Simplifies developer experience and deployment.
 
-There is a supervisor agent that will assign/route incoming user query to one of the worker agents.
-the 3 worker agents are :
-
-- (1) a `rag_agent` made out of `llama_index` via a custom `llama-index-rag` tool
-- (2) a `research_agent` made out of a LangChain runnable chain with tool calling capability, able to call arXiv as a tool and return summarized found research papers
-- (3) a chitchat agent that is able to handle general chitchat query from user, constructed via haystack's pipeline
-
-the multi-agents architecture looks like the below
-
-![LangGraph multi-agents workflow](../../docs/source/_static/aiq_multi_frameworks_agentic_schema.png)
 
 ## Local Installation and Usage
 
