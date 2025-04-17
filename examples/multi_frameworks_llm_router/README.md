@@ -38,7 +38,7 @@ We use the code of `multi_frameworks` as the foundation and modify it to build `
 
 ## Key Features
 
-- **LLM Router Integration:** with integration with LLM Router, this workflow demostrates how we build workflows that can tap into the power of LLM Router. 
+- **LLM Router Integration:** with integration with LLM Router, this workflow demonstrates how we build workflows that can tap into the power of LLM Router. 
 - **Custom-plug-in Tools:** with a basic llama-index RAG ingesting README from within this workflow
 - **Custom Plugin System:** Developers can bring in new tools using plugins.
 - **High-level API:** Enables defining functions that transform into asynchronous LangChain tools.
