@@ -16,6 +16,7 @@
 from aiq.builder.builder import Builder
 from aiq.builder.framework_enum import LLMFrameworkEnum
 from aiq.cli.register_workflow import register_llm_client
+from aiq.llm.llm_router import LLMRouterConfig
 from aiq.llm.nim_llm import NIMModelConfig
 from aiq.llm.openai_llm import OpenAIModelConfig
 
@@ -34,3 +35,16 @@ async def openai_langchain(llm_config: OpenAIModelConfig, builder: Builder):
     from langchain_openai import ChatOpenAI
 
     yield ChatOpenAI(**llm_config.model_dump(exclude={"type"}, by_alias=True))
+
+
+@register_llm_client(config_type=LLMRouterConfig, wrapper_type=LLMFrameworkEnum.LANGCHAIN)
+async def llm_router_langchain(llm_config: LLMRouterConfig, builder: Builder):
+
+    from openai import OpenAI
+
+    yield OpenAI(api_key=llm_config.api_key,
+                 max_retries=0,
+                 base_url=llm_config.base_url,
+                 default_headers={
+                     "Content-Type": "application/json", "Authorization": f"Bearer {llm_config.api_key}"
+                 })

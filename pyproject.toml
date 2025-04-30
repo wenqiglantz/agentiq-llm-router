@@ -63,7 +63,9 @@ zep-cloud = ["agentiq-zep-cloud"]
 
 examples = [
   "aiq_email_phishing_analyzer",
+  "llm_router_integration",
   "aiq_multi_frameworks",
+  "aiq_multi_frameworks_llm_router",
   "aiq_plot_charts",
   "aiq_semantic_kernel_demo",
   "aiq_simple_calculator",
@@ -95,7 +97,9 @@ agentiq-zep-cloud = { workspace = true }
 
 # All examples here
 aiq_email_phishing_analyzer = { path = "examples/email_phishing_analyzer", editable = true }
+llm_router_integration = { path = "examples/llm_router_integration", editable = true }
 aiq_multi_frameworks = { path = "examples/multi_frameworks", editable = true }
+aiq_multi_frameworks_llm_router = { path = "examples/multi_frameworks_llm_router", editable = true }
 aiq_plot_charts = { path = "examples/plot_charts", editable = true }
 aiq_semantic_kernel_demo = { path = "examples/semantic_kernel_demo", editable = true }
 aiq_simple = { path = "examples/simple", editable = true }
